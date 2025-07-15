@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Deft
 
-## Getting Started
+**Deft** is a personal clarity engine and project management tool.
 
-First, run the development server:
+Unlike traditional task managers or note-taking tools, Deft is designed to help you **break down complex goals into manageable parts**, **visually map dependencies**, and **capture thought processes, questions, and decisions** — all in one place.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Purpose
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Deft exists to solve a real problem:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> It's easy to follow structured learning (like a course), but hard to create your own structure from scratch.
 
-## Learn More
+Deft helps you:
 
-To learn more about Next.js, take a look at the following resources:
+- Define a project or goal
+- Break it down into structured sections
+- Add steps, notes, todos, and questions inside each section
+- Link steps together with dependencies
+- Think through problems without losing context or clarity
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📌 MVP Scope
 
-## Deploy on Vercel
+- [ ] Create a new project/goal with a title
+- [ ] Add freeform **sections** under the project
+- [ ] Each section can include:
+  - [ ] Notes
+  - [ ] Todos
+  - [ ] Questions
+- [ ] Mark progress on steps
+- [ ] Toggle between reading and editing modes
+- [ ] Store all data locally for now (no backend)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🧠 Why Markdown, .txt files, or Notion didn’t work
+
+- Writing alone didn’t give structure
+- Notion was too open-ended
+- Dependencies and inter-step thinking were missing
+- Switching between tools created friction
+- I kept looping on the same problems — Deft is my way out
+
+---
+
+## 🛠 Tech Stack
+
+- [Next.js](https://nextjs.org/) (App Router)
+- [TailwindCSS](https://tailwindcss.com/) for styling
+- [TypeScript](https://www.typescriptlang.org/) for sanity
+- [Zustand](https://github.com/pmndrs/zustand) or `useState` for MVP state
+
+---
+
+## 📂 Project Structure (planned)
