@@ -1,40 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { Project } from "./types/project";
+import React, { useState } from "react";
+import { Project } from "../types/project";
 
-// Issues
-// - [ ] Fix projects (state variable) type and the data type
-
-export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([]);
+export default function page() {
   const [projectName, setProjectName] = useState("");
+  const [projects, setProjects] = useState<Project[][]>([]);
 
   const updateProject = (value: string) => {
     setProjectName(value);
   };
-
-  const getProjects = async () => {
-    try {
-      const res = await fetch("/api/project");
-
-      if (!res.ok) throw new Error("Failed to create project");
-
-      const newProjects = await res.json();
-      console.log("newProjects: ", newProjects);
-
-      setProjects((prev) => [...prev, newProjects]);
-      setProjectName("");
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
-
-  // - [ ] on page load get all the projects from the backend
-  useEffect(() => {
-    getProjects();
-  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -53,6 +28,12 @@ export default function Home() {
       setProjectName("");
     } catch (error) {
       console.error("Error creating project:", error);
+    }
+  };
+
+  const handleKeyPress = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSubmit();
     }
   };
 
@@ -90,16 +71,14 @@ export default function Home() {
                 value={projectName}
                 placeholder="Enter your project name"
                 onChange={(e) => updateProject(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus::border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </div>
 
             <button
               onClick={handleSubmit}
               disabled={!projectName.trim()}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700
-              disabled:from-slate-600 disabled:to-slate-600 text-white
-              font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
             >
               Create Project
             </button>
@@ -117,21 +96,23 @@ export default function Home() {
               <div className="text-6xl mb-4">📁</div>
               <p className="text-slate-300 text-lg">No projects yet</p>
               <p className="text-slate-400 text-sm mt-2">
-                Create your first project above to get started.
+                Create your first project above to get started
               </p>
             </div>
           ) : (
             <div className="grid gap-4">
-              {projects.map((project, index) => (
+              {projects.map((project) => (
                 <div
-                  key={index}
+                  /* - [ ] Fix this */
+                  key={project[0].id}
                   className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <span className="text-white font-medium">
-                        {project.title}
+                        {/* - [ ] Fix this */}
+                        {project[0].title}
                       </span>
                     </div>
                     <div className="text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -144,6 +125,7 @@ export default function Home() {
           )}
         </div>
       </div>
+
       {/* Footer */}
       <div className="bg-black/20 backdrop-blur-sm border-t border-white/10 py-6">
         <div className="max-w-4xl mx-auto px-6 text-center">

@@ -18,14 +18,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request, res: Response) {
-  // - [ ] get actual projectId
-  const projectId = 1;
-
-  const project = await prisma.project.findFirst({
-    where: {
-      id: projectId,
-    },
-  });
+  const project = await prisma.project.findMany({});
 
   return new Response(JSON.stringify(project), {
     status: 201,
