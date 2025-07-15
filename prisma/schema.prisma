@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  email     String    @unique
+  name      String?
+  projects  Project[]
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String    @db.VarChar(255)
+  description String?
+  status      Status    @default(OPEN)
+  priority    Int       @default(3)
+  dueDate     DateTime?
+
+  author   User? @relation(fields: [authorId], references: [id])
+  authorId Int?
+
+  tasks Task[] @relation("ProjectTasks")
+  tags  Tag[]  @relation("ProjectTags")
+}
+
+model Task {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+
+  projects Project[] @relation("ProjectTasks")
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+
+  projects Project[] @relation("ProjectTags")
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
