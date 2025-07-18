@@ -1,17 +1,20 @@
 import prisma from "@/lib/prisma";
 
-export async function GET(req: Request, res: Response) {
-  // - [ ] get actual projectId
-  const projectId = 1;
+// In progress
+
+// Questions
+
+export async function GET(req: Request, { params }: any) {
+  const { projectId } = await params;
 
   const project = await prisma.project.findFirst({
     where: {
-      id: projectId,
+      id: parseInt(projectId),
     },
   });
 
   return new Response(JSON.stringify(project), {
-    status: 201,
+    status: 200,
     headers: { "Content-Type": "application/json" },
   });
 }

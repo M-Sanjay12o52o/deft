@@ -15,8 +15,6 @@ export default function Home() {
   const [counter, setCounter] = useState<number | null>(null);
   const router = useRouter();
 
-  console.log("projects: ", projects);
-
   const updateProject = (value: string) => {
     setProjectName(value);
   };
@@ -29,13 +27,10 @@ export default function Home() {
     try {
       const res = await fetch("/api/projects");
 
-      console.log("hello from fetch projects");
-
       if (!res.ok) throw new Error("Failed to create project");
 
       const projectsFromDB = await res.json();
 
-      // setProjects((prev) => [...prev, ...newProjects]);
       setProjects(projectsFromDB);
       setProjectName("");
     } catch (error) {
@@ -60,7 +55,7 @@ export default function Home() {
       if (!res.ok) throw new Error("Failed to create project");
 
       const newProject = await res.json();
-      setProjects((prev) => [...prev, ...newProject]);
+      setProjects((prev) => [...prev, newProject]);
       setProjectName("");
 
       router.push(`/project/${newProject.id}`);
@@ -70,8 +65,6 @@ export default function Home() {
   };
 
   return (
-    // <div className="min-h-screen bg-[rgb(68,66,79)] flex flex-col">
-    // <div className="min-h-screen bg-[rgb(36, 30, 74)] flex flex-col">
     <div className="min-h-screen bg-[rgb(22, 22, 40)] flex flex-col">
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
