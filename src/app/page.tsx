@@ -7,41 +7,42 @@ import { useRouter } from "next/navigation";
 
 // In Progress
 
-// - [ ] add enable background color for the button
-// - [ ] better UI and theme for the home page
+// Questions:
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectName, setProjectName] = useState("");
+  const [counter, setCounter] = useState<number | null>(null);
   const router = useRouter();
 
   console.log("projects: ", projects);
-  console.log("typeof projects: ", typeof projects);
-  console.log("projectName: ", projectName);
-  console.log("typeof projectName: ", typeof projectName);
 
   const updateProject = (value: string) => {
     setProjectName(value);
   };
 
   const getProjects = async () => {
+    let newVal = counter! + 1;
+
+    setCounter(newVal);
+
     try {
-      const res = await fetch("/api/project");
+      const res = await fetch("/api/projects");
+
+      console.log("hello from fetch projects");
 
       if (!res.ok) throw new Error("Failed to create project");
 
-      const newProjects = await res.json();
-      console.log("newProjects: ", newProjects);
-      console.log("typeof newProjects: ", typeof newProjects);
+      const projectsFromDB = await res.json();
 
-      setProjects((prev) => [...prev, ...newProjects]);
+      // setProjects((prev) => [...prev, ...newProjects]);
+      setProjects(projectsFromDB);
       setProjectName("");
     } catch (error) {
       console.error("Error fetching projects:", error);
     }
   };
 
-  // - [ ] on page load get all the projects from the backend
   useEffect(() => {
     getProjects();
   }, []);
@@ -59,7 +60,7 @@ export default function Home() {
       if (!res.ok) throw new Error("Failed to create project");
 
       const newProject = await res.json();
-      setProjects((prev) => [...prev, newProject]);
+      setProjects((prev) => [...prev, ...newProject]);
       setProjectName("");
 
       router.push(`/project/${newProject.id}`);
@@ -121,8 +122,7 @@ export default function Home() {
             <button
               onClick={handleSubmit}
               disabled={!projectName.trim()}
-              className="w-full bg-gradient-to-r 
-              text-white font-semibold py-4 px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+              className="w-full disabled:bg-white/10 bg-slate-600 text-white font-semibold py-4 px-6 transition-all duration-200 transform disabled:cursor-not-allowed disabled:transform-none shadow-lg cursor-pointer"
             >
               Create Project
             </button>
@@ -131,10 +131,12 @@ export default function Home() {
 
         {/* Projects List */}
         <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 shadow-2xl">
-          <h2 className="text-2xl font-semibold text-white mb-6">
-            Your Projects
-          </h2>
-
+          <div className="flex flex-row justify-between">
+            <h2 className="text-2xl font-semibold text-white mb-6">
+              Your Projects
+            </h2>
+            <h3>Total Projects {projects.length}</h3>
+          </div>
           {projects.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📁</div>
