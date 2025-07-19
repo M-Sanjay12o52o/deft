@@ -17,17 +17,6 @@ interface Reference {
   url: string;
 }
 
-// In Progress
-
-// - [ ] "contentEditable Title"
-// - [ ] contentEditable description
-
-// Bugs
-
-// - [ ] Placeholder on the editableTitle is not showing
-
-// Questions
-
 const TaskComponent: FC<TaskComponentProps> = ({}) => {
   const initialTodos: Todo[] = [
     {
@@ -85,163 +74,208 @@ const TaskComponent: FC<TaskComponentProps> = ({}) => {
     );
   };
 
-  const deleteTodo = (id: string) => {};
+  const deleteTodo = (id: string) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
 
-  const addReference = () => {};
+  const addReference = () => {
+    if (newRefTitle.trim() && newRefUrl.trim()) {
+      const newReference: Reference = {
+        id: Date.now().toString(),
+        title: newRefTitle.trim(),
+        url: newRefUrl.trim(),
+      };
+      setReferences([...references, newReference]);
+      setNewRefTitle("");
+      setNewRefUrl("");
+    }
+  };
+
+  const deleteReference = (id: string) => {
+    setReferences(references.filter((ref) => ref.id !== id));
+  };
 
   return (
-    <div className="p-6 bg-[rgb(22, 22, 40)] min-h-screen text-white">
-      {/* Title */}
-      <div className="mb-2">
-        <div
-          ref={titleRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={(e) => setTitle(e.currentTarget.textContent || "")}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
-          className="text-4xl font-bold focus:outline-none relative text-white empty:before:content-[attr(data-placeholder)] empty:before:text-gray-500 empty:before:pointer-events-none"
-          data-placeholder="Untitled Task"
-          style={{ minHeight: "3rem" }}
-        />
-      </div>
-
-      {/* Description */}
-      <div className="mb-8">
-        <div
-          ref={descriptionRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={(e) => setDescription(e.currentTarget.textContent || "")}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
-          className="text-base font-semibold text-gray-500 focus:outline-none relative empty:before:content-[attr(data-placeholder)] empty:before:pointer-events-none"
-          data-placeholder="Add a description for this task..."
-          style={{ minHeight: "2rem" }}
-        />
-      </div>
-
-      {/* Todos */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <List className="w-5 h-5" />
-          <h2 className="text-xl font-semibold text-gray-300">Todo Items</h2>
+    <div className="min-h-screen bg-[rgb(22, 22, 40)]">
+      {/* Header */}
+      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div
+            ref={titleRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={(e) => setTitle(e.currentTarget.textContent || "")}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            className="text-4xl font-bold text-white focus:outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 empty:before:pointer-events-none mb-2"
+            data-placeholder="Untitled Task"
+          />
+          <div
+            ref={descriptionRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={(e) => setDescription(e.currentTarget.textContent || "")}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            className="text-lg text-slate-300 focus:outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 empty:before:pointer-events-none"
+            data-placeholder="Add a description for this task..."
+          />
         </div>
-        <div className="bg-gray-800 rounded-lg p-4">
-          {todos.map((todo) => (
-            <div key={todo.id} className="flex items-center gap-3 mb-2 group">
-              <button onClick={() => toggleTodo(todo.id)}>
-                {todo.completed ? (
-                  <Check className="w-3 h-3 text-green-300" />
-                ) : null}
-              </button>
-              <span
-                className={`flex-grow ${
-                  todo.completed ? "line-through text-gray-500" : "text-white"
-                }`}
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
+        {/* Todos Section */}
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <List className="w-6 h-6 text-blue-400" />
+            <h2 className="text-2xl font-semibold text-white">Todo Items</h2>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            {todos.map((todo) => (
+              <div
+                key={todo.id}
+                className="flex items-center gap-4 p-3 bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200 group"
               >
-                {todo.text}
-              </span>
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-          <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => toggleTodo(todo.id)}
+                  className="flex-shrink-0 w-5 h-5 border-2 border-white/30 rounded flex items-center justify-center hover:border-green-400 transition-colors"
+                >
+                  {todo.completed && (
+                    <Check className="w-3 h-3 text-green-400" />
+                  )}
+                </button>
+                <span
+                  className={`flex-grow text-white ${
+                    todo.completed ? "line-through text-slate-400" : ""
+                  }`}
+                >
+                  {todo.text}
+                </span>
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                  className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-all duration-200 flex-shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-4">
             <input
               type="text"
               value={newTodoText}
               onChange={(e) => setNewTodoText(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTodo()}
               placeholder="Add new todo item..."
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-transparent transition-all duration-200"
             />
             <button
               onClick={addTodo}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition-colors"
+              disabled={!newTodoText.trim()}
+              className="w-full disabled:bg-white/10 bg-slate-600 hover:bg-slate-500 text-white font-semibold py-3 px-6 transition-all duration-200 transform disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Add
+              Add Todo
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Notes */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="w-5 h-5 text-purple-400" />
-          <h2 className="text-xl font-semibold text-gray-300">Notes</h2>
+        {/* Notes Section */}
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <BookOpen className="w-6 h-6 text-purple-400" />
+            <h2 className="text-2xl font-semibold text-white">Notes</h2>
+          </div>
+          <div
+            ref={notesRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={(e) => setNotes(e.currentTarget.textContent || "")}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            className="w-full min-h-[200px] px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-transparent transition-all duration-200 empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 empty:before:pointer-events-none"
+            data-placeholder="Add your notes, thoughts, or additional information here..."
+          />
         </div>
-        <div
-          ref={notesRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={(e) => setNotes(e.currentTarget.textContent || "")}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
-          className="text-base focus:outline-none bg-gray-800 rounded-lg p-4 min-h-[150px] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-500 empty:before:pointer-events-none"
-          data-placeholder="Add your notes, thoughts, or additional information here..."
-        />
-      </div>
 
-      {/* References */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <Link className="w-5 h-5 text-orange-400" />
-          <h2 className="text-xl font-semibold text-gray-300">References</h2>
-        </div>
-        <div className="bg-gray-800 rounded-lg p-4">
-          {references.map((ref) => (
-            <div key={ref.id} className="flex items-center gap-3 mb-2 group">
-              <Link className="w-4 h-4 text-blue-400 flex-shrink-0" />
-              <div className="flex-grow">
-                <a
-                  href={ref.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline block"
-                >
-                  {ref.title}
-                </a>
-                <span className="text-xs text-gray-500">{ref.url}</span>
-              </div>
-              <button
-                onClick={() => deleteReference(ref.id)}
-                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
+        {/* References Section */}
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <Link className="w-6 h-6 text-orange-400" />
+            <h2 className="text-2xl font-semibold text-white">References</h2>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            {references.map((ref) => (
+              <div
+                key={ref.id}
+                className="flex items-center gap-4 p-3 bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200 group"
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-          <div className="space-y-2 mt-4">
+                <Link className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <div className="flex-grow min-w-0">
+                  <a
+                    href={ref.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline block truncate"
+                  >
+                    {ref.title}
+                  </a>
+                  <span className="text-xs text-slate-400 block truncate">
+                    {ref.url}
+                  </span>
+                </div>
+                <button
+                  onClick={() => deleteReference(ref.id)}
+                  className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-all duration-200 flex-shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-4">
             <input
               type="text"
               value={newRefTitle}
               onChange={(e) => setNewRefTitle(e.target.value)}
               placeholder="Reference title..."
-              className="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-transparent transition-all duration-200"
             />
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <input
                 type="url"
                 value={newRefUrl}
                 onChange={(e) => setNewRefUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addReference()}
                 placeholder="https://example.com"
-                className="flex-grow bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-grow px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-transparent transition-all duration-200"
               />
               <button
                 onClick={addReference}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition-colors"
+                disabled={!newRefTitle.trim() || !newRefUrl.trim()}
+                className="disabled:bg-white/10 bg-slate-600 hover:bg-slate-500 text-white font-semibold py-3 px-6 transition-all duration-200 disabled:cursor-not-allowed shadow-lg flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Add
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="bg-black/20 backdrop-blur-sm border-t border-white/10 py-6">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-slate-400 text-sm">
+            {todos.filter((t) => t.completed).length} of {todos.length} todos
+            completed • {references.length} reference
+            {references.length !== 1 ? "s" : ""} added
+          </p>
         </div>
       </div>
     </div>
