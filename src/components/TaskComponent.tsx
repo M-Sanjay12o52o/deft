@@ -2,6 +2,7 @@
 
 import { BookOpen, Check, Link, List, Plus, X } from "lucide-react";
 import { FC, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 
 interface TaskComponentProps {}
 
@@ -16,6 +17,12 @@ interface Reference {
   title: string;
   url: string;
 }
+
+// - In Progress
+
+// - [ ] Adding markdown format for the notes. Obsidian (write and preview on the same place)
+
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 const TaskComponent: FC<TaskComponentProps> = ({}) => {
   const initialTodos: Todo[] = [
@@ -189,7 +196,15 @@ const TaskComponent: FC<TaskComponentProps> = ({}) => {
             <BookOpen className="w-6 h-6 text-purple-400" />
             <h2 className="text-2xl font-semibold text-white">Notes</h2>
           </div>
-          <div
+          <div>
+            <MDEditor
+              value={notes}
+              onChange={(val) => setNotes(val || "")}
+              height={300}
+            />
+          </div>
+
+          {/* <div
             ref={notesRef}
             contentEditable
             suppressContentEditableWarning
@@ -198,7 +213,7 @@ const TaskComponent: FC<TaskComponentProps> = ({}) => {
             onKeyDown={handleKeyDown}
             className="w-full min-h-[200px] px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-transparent transition-all duration-200 empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 empty:before:pointer-events-none"
             data-placeholder="Add your notes, thoughts, or additional information here..."
-          />
+          /> */}
         </div>
 
         {/* References Section */}
