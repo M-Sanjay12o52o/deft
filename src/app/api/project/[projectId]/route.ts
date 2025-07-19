@@ -11,6 +11,7 @@ export async function GET(req: Request, { params }: any) {
     where: {
       id: parseInt(projectId),
     },
+    include: { tasks: true },
   });
 
   return new Response(JSON.stringify(project), {

@@ -1,139 +1,260 @@
 "use client";
+import { FC, useState, useRef, KeyboardEvent } from "react";
+import {
+  Plus,
+  X,
+  Check,
+  Square,
+  Link,
+  FileText,
+  List,
+  BookOpen,
+} from "lucide-react";
 
-import React, { useState } from "react";
-import { Project } from "../types/project";
+interface TaskComponentProps {}
 
-export default function page() {
-  const [projectName, setProjectName] = useState("");
-  const [projects, setProjects] = useState<Project[][]>([]);
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+}
 
-  const updateProject = (value: string) => {
-    setProjectName(value);
+interface Reference {
+  id: string;
+  title: string;
+  url: string;
+}
+
+const TaskComponent: FC<TaskComponentProps> = ({}) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [notes, setNotes] = useState("");
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [references, setReferences] = useState<Reference[]>([]);
+  const [newTodoText, setNewTodoText] = useState("");
+  const [newRefTitle, setNewRefTitle] = useState("");
+  const [newRefUrl, setNewRefUrl] = useState("");
+
+  const titleRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+  const notesRef = useRef<HTMLDivElement>(null);
+
+  const handleSave = () => {
+    // Auto-save functionality could be implemented here
+    console.log("Auto-saving...");
   };
 
-  const handleSubmit = async () => {
-    try {
-      const res = await fetch("/api/project", {
-        method: "POST",
-        body: JSON.stringify({ title: projectName }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to create project");
-
-      const newProject = await res.json();
-      setProjects((prev) => [...prev, newProject]);
-      setProjectName("");
-    } catch (error) {
-      console.error("Error creating project:", error);
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.currentTarget.blur();
     }
   };
 
-  const handleKeyPress = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSubmit();
+  const addTodo = () => {
+    if (newTodoText.trim()) {
+      const newTodo: Todo = {
+        id: Date.now().toString(),
+        text: newTodoText.trim(),
+        completed: false,
+      };
+      setTodos([...todos, newTodo]);
+      setNewTodoText("");
     }
+  };
+
+  const toggleTodo = (id: string) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id: string) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const addReference = () => {
+    if (newRefTitle.trim() && newRefUrl.trim()) {
+      const newRef: Reference = {
+        id: Date.now().toString(),
+        title: newRefTitle.trim(),
+        url: newRefUrl.trim(),
+      };
+      setReferences([...references, newRef]);
+      setNewRefTitle("");
+      setNewRefUrl("");
+    }
+  };
+
+  const deleteReference = (id: string) => {
+    setReferences(references.filter((ref) => ref.id !== id));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
-      {/* Header */}
-      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Project Manager
-          </h1>
-          <p className="text-slate-300">Create and organize your projects</p>
-        </div>
+    <div className="max-w-4xl mx-auto p-6 bg-gray-900 min-h-screen text-white">
+      {/* Title */}
+      <div className="mb-8">
+        <div
+          ref={titleRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={(e) => setTitle(e.currentTarget.textContent || "")}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          className="text-4xl font-bold focus:outline-none relative text-white empty:before:content-[attr(data-placeholder)] empty:before:text-gray-500 empty:before:pointer-events-none"
+          data-placeholder="Untitled Task"
+          style={{ minHeight: "3rem" }}
+        />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 max-w-4xl mx-auto px-6 py-12 w-full">
-        {/* Project Creation Form */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 mb-12 shadow-2xl">
-          <h2 className="text-2xl font-semibold text-white mb-6">
-            Create New Project
-          </h2>
+      {/* Description */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <FileText className="w-5 h-5 text-blue-400" />
+          <h2 className="text-xl font-semibold text-gray-300">Description</h2>
+        </div>
+        <div
+          ref={descRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={(e) => setDescription(e.currentTarget.textContent || "")}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          className="text-lg focus:outline-none bg-gray-800 rounded-lg p-4 min-h-[100px] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-500 empty:before:pointer-events-none"
+          data-placeholder="Add a description for this task..."
+        />
+      </div>
 
-          <div className="space-y-6">
-            <div>
-              <label
-                htmlFor="projectname"
-                className="block text-sm font-medium text-slate-300 mb-2"
+      {/* Todos */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <List className="w-5 h-5 text-green-400" />
+          <h2 className="text-xl font-semibold text-gray-300">Todo Items</h2>
+        </div>
+        <div className="bg-gray-800 rounded-lg p-4">
+          {todos.map((todo) => (
+            <div key={todo.id} className="flex items-center gap-3 mb-2 group">
+              <button
+                onClick={() => toggleTodo(todo.id)}
+                className="flex-shrink-0 w-5 h-5 rounded border-2 border-gray-600 flex items-center justify-center hover:border-green-400 transition-colors"
               >
-                Project Name
-              </label>
-              <input
-                id="projectname"
-                type="text"
-                value={projectName}
-                placeholder="Enter your project name"
-                onChange={(e) => updateProject(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              />
+                {todo.completed ? (
+                  <Check className="w-3 h-3 text-green-400" />
+                ) : null}
+              </button>
+              <span
+                className={`flex-grow ${
+                  todo.completed ? "line-through text-gray-500" : "text-white"
+                }`}
+              >
+                {todo.text}
+              </span>
+              <button
+                onClick={() => deleteTodo(todo.id)}
+                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-
+          ))}
+          <div className="flex gap-2 mt-4">
+            <input
+              type="text"
+              value={newTodoText}
+              onChange={(e) => setNewTodoText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addTodo()}
+              placeholder="Add new todo item..."
+              className="flex-grow bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
             <button
-              onClick={handleSubmit}
-              disabled={!projectName.trim()}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+              onClick={addTodo}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition-colors"
             >
-              Create Project
+              <Plus className="w-4 h-4" />
+              Add
             </button>
           </div>
         </div>
-
-        {/* Projects List */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 shadow-2xl">
-          <h2 className="text-2xl font-semibold text-white mb-6">
-            Your Projects
-          </h2>
-
-          {projects.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📁</div>
-              <p className="text-slate-300 text-lg">No projects yet</p>
-              <p className="text-slate-400 text-sm mt-2">
-                Create your first project above to get started
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {projects.map((project) => (
-                <div
-                  /* - [ ] Fix this */
-                  key={project[0].id}
-                  className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-white font-medium">
-                        {/* - [ ] Fix this */}
-                        {project[0].title}
-                      </span>
-                    </div>
-                    <div className="text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      Active
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Footer */}
-      <div className="bg-black/20 backdrop-blur-sm border-t border-white/10 py-6">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-slate-400 text-sm">
-            {projects.length} project{projects.length !== 1 ? "s" : ""} created
-          </p>
+      {/* Notes */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <BookOpen className="w-5 h-5 text-purple-400" />
+          <h2 className="text-xl font-semibold text-gray-300">Notes</h2>
+        </div>
+        <div
+          ref={notesRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={(e) => setNotes(e.currentTarget.textContent || "")}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          className="text-base focus:outline-none bg-gray-800 rounded-lg p-4 min-h-[150px] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-500 empty:before:pointer-events-none"
+          data-placeholder="Add your notes, thoughts, or additional information here..."
+        />
+      </div>
+
+      {/* References */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <Link className="w-5 h-5 text-orange-400" />
+          <h2 className="text-xl font-semibold text-gray-300">References</h2>
+        </div>
+        <div className="bg-gray-800 rounded-lg p-4">
+          {references.map((ref) => (
+            <div key={ref.id} className="flex items-center gap-3 mb-2 group">
+              <Link className="w-4 h-4 text-blue-400 flex-shrink-0" />
+              <div className="flex-grow">
+                <a
+                  href={ref.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline block"
+                >
+                  {ref.title}
+                </a>
+                <span className="text-xs text-gray-500">{ref.url}</span>
+              </div>
+              <button
+                onClick={() => deleteReference(ref.id)}
+                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+          <div className="space-y-2 mt-4">
+            <input
+              type="text"
+              value={newRefTitle}
+              onChange={(e) => setNewRefTitle(e.target.value)}
+              placeholder="Reference title..."
+              className="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={newRefUrl}
+                onChange={(e) => setNewRefUrl(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addReference()}
+                placeholder="https://example.com"
+                className="flex-grow bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={addReference}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default TaskComponent;

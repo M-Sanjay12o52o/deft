@@ -22,15 +22,13 @@ model Project {
   updatedAt   DateTime  @updatedAt
   title       String    @db.VarChar(255)
   description String?
-  status      Status    @default(OPEN)
   priority    Int       @default(3)
   dueDate     DateTime?
 
   author   User? @relation(fields: [authorId], references: [id])
   authorId Int?
 
-  tasks Task[] @relation("ProjectTasks")
-  tags  Tag[]  @relation("ProjectTags")
+  tasks Task[]
 }
 
 model Task {
@@ -39,20 +37,6 @@ model Task {
   updatedAt DateTime @updatedAt
   title     String   @db.VarChar(255)
 
-  projects Project[] @relation("ProjectTasks")
-}
-
-model Tag {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String   @db.VarChar(255)
-
-  projects Project[] @relation("ProjectTags")
-}
-
-enum Status {
-  OPEN
-  IN_PROGRESS
-  CLOSED
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
 }
